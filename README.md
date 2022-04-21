@@ -20,6 +20,25 @@ Add the following keys to your _Info.plist_ file, located in `<project root>/ios
 
 * `android.permission.WRITE_EXTERNAL_STORAGE` - Permission for usage of external storage
 
+* `android:requestLegacyExternalStorage="true"` - Must include permission targeting API < 19 inside the "application" tag
+
+## Additional
+
+* Modification for "filename" has been added.
+
+* Support for adding generic file.
+  - GallerySaver.saveFile - default location ENVIRONMENT.DOCUMENTS (Android ✓)
+
+* Now returns an instance of "GallerySaverResult". 
+  - GallerySaverResult.path - returns the path where the actual file is stored.
+  - GallerySaverResult.isSaved - bool check if it is properly saved.
+  - GallerySaverResult.isDeleted - bool check if it is properly deleted.
+
+* Support for removing file. (Android ✓)
+  - GallerySaver.deleteImage
+  - GallerySaver.deleteVideo
+  - GallerySaver.deleteFile
+
 ### Example
 
 ``` dart

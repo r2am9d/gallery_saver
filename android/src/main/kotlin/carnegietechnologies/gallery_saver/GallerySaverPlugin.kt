@@ -20,18 +20,22 @@ class GallerySaverPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(binding.binaryMessenger, "gallery_saver")
         channel.setMethodCallHandler(this)
-
-
     }
 
     override fun onMethodCall(call: MethodCall, result: Result) {
         when (call.method) {
+            
             "saveImage" -> gallerySaver?.checkPermissionAndSaveFile(call, result, MediaType.image)
             "saveVideo" -> gallerySaver?.checkPermissionAndSaveFile(call, result, MediaType.video)
+            "saveFile"  -> gallerySaver?.checkPermissionAndSaveFile(call, result, MediaType.file)
+
+            "deleteImage" -> gallerySaver?.deleteFile(call, result, MediaType.image)
+            "deleteVideo" -> gallerySaver?.deleteFile(call, result, MediaType.video)
+            "deleteFile" -> gallerySaver?.deleteFile(call, result, MediaType.file)
+
             else -> result.notImplemented()
         }
     }
-
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         this.activity = binding.activity
@@ -54,6 +58,5 @@ class GallerySaverPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
-
     }
 }

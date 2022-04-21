@@ -1,10 +1,11 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -30,65 +31,80 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        home: Scaffold(
-      body: SafeArea(
-        child: Container(
-          color: Colors.white,
-          child: Column(
-            children: <Widget>[
-              Flexible(
-                flex: 1,
-                child: Container(
-                  child: SizedBox.expand(
-                    child: TextButton(
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(Colors.blue),
-                      ),
-                      onPressed: _takePhoto,
-                      child: Text(firstButtonText,
+      home: Scaffold(
+        body: SafeArea(
+          child: Container(
+            color: Colors.white,
+            child: Column(
+              children: <Widget>[
+                Flexible(
+                  flex: 1,
+                  child: Container(
+                    child: SizedBox.expand(
+                      child: TextButton(
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.blue),
+                        ),
+                        onPressed: _takePhoto,
+                        child: Text(
+                          firstButtonText,
                           style: TextStyle(
-                              fontSize: textSize, color: Colors.white)),
+                            fontSize: textSize,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              ScreenshotWidget(),
-              Flexible(
-                child: Container(
-                    child: SizedBox.expand(
-                  child: TextButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.white),
-                    ),
-                    onPressed: _recordVideo,
-                    child: Text(secondButtonText,
+                ScreenshotWidget(),
+                Flexible(
+                  child: Container(
+                      child: SizedBox.expand(
+                    child: TextButton(
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(Colors.white),
+                      ),
+                      onPressed: _recordVideo,
+                      child: Text(
+                        secondButtonText,
                         style: TextStyle(
-                            fontSize: textSize, color: Colors.blueGrey)),
-                  ),
-                )),
-                flex: 1,
-              )
-            ],
+                          fontSize: textSize,
+                          color: Colors.blueGrey,
+                        ),
+                      ),
+                    ),
+                  )),
+                  flex: 1,
+                )
+              ],
+            ),
           ),
         ),
       ),
-    ));
+    );
   }
 
   void _takePhoto() async {
     ImagePicker()
         .getImage(source: ImageSource.camera)
-        .then((PickedFile recordedImage) {
+        .then((PickedFile recordedImage) async {
       if (recordedImage != null && recordedImage.path != null) {
         setState(() {
           firstButtonText = 'saving in progress...';
         });
-        GallerySaver.saveImage(recordedImage.path, albumName: albumName)
-            .then((bool success) {
+        final result = await GallerySaver.saveImage(
+          recordedImage.path,
+          fileName: 'Testname',
+          albumName: albumName,
+        );
+        if (result.isSaved) {
           setState(() {
             firstButtonText = 'image saved!';
           });
-        });
+        }
       }
     });
   }
@@ -96,17 +112,20 @@ class _MyAppState extends State<MyApp> {
   void _recordVideo() async {
     ImagePicker()
         .getVideo(source: ImageSource.camera)
-        .then((PickedFile recordedVideo) {
+        .then((PickedFile recordedVideo) async {
       if (recordedVideo != null && recordedVideo.path != null) {
         setState(() {
           secondButtonText = 'saving in progress...';
         });
-        GallerySaver.saveVideo(recordedVideo.path, albumName: albumName)
-            .then((bool success) {
+        final result = await GallerySaver.saveVideo(
+          recordedVideo.path,
+          albumName: albumName,
+        );
+        if (result.isSaved) {
           setState(() {
             secondButtonText = 'video saved!';
           });
-        });
+        }
       }
     });
   }
@@ -115,22 +134,24 @@ class _MyAppState extends State<MyApp> {
   void _saveNetworkVideo() async {
     String path =
         'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4';
-    GallerySaver.saveVideo(path, albumName: albumName).then((bool success) {
+    final result = await GallerySaver.saveVideo(path, albumName: albumName);
+    if (result.isSaved) {
       setState(() {
         print('Video is saved');
       });
-    });
+    }
   }
 
   // ignore: unused_element
   void _saveNetworkImage() async {
     String path =
         'https://image.shutterstock.com/image-photo/montreal-canada-july-11-2019-600w-1450023539.jpg';
-    GallerySaver.saveImage(path, albumName: albumName).then((bool success) {
+    final result = await GallerySaver.saveImage(path, albumName: albumName);
+    if (result.isSaved) {
       setState(() {
         print('Image is saved');
       });
-    });
+    }
   }
 }
 
@@ -185,11 +206,12 @@ class _ScreenshotWidgetState extends State<ScreenshotWidget> {
       await capturedFile.writeAsBytes(pngBytes);
       print(capturedFile.path);
 
-      await GallerySaver.saveImage(capturedFile.path).then((value) {
+      final result = await GallerySaver.saveImage(capturedFile.path);
+      if (result.isSaved) {
         setState(() {
           screenshotButtonText = 'screenshot saved!';
         });
-      });
+      }
     } catch (e) {
       print(e);
     }

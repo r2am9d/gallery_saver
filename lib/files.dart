@@ -1,4 +1,3 @@
-
 const List<String> videoFormats = [
   '.mp4',
   '.mov',
@@ -9,6 +8,7 @@ const List<String> videoFormats = [
   '.mkv',
   '.flv'
 ];
+
 const List<String> imageFormats = [
   '.jpeg',
   '.png',
@@ -18,6 +18,7 @@ const List<String> imageFormats = [
   '.tif',
   '.heic'
 ];
+
 const http = 'http';
 
 bool isLocalFilePath(String path) {
